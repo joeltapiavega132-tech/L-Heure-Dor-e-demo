@@ -63,14 +63,33 @@ function Scene({drink,detail,roastHover}) {
 function App(){
   const [active,setActive]=useState(0), [entered,setEntered]=useState(false), [progress,setProgress]=useState(0), [detail,setDetail]=useState(false), [panel,setPanel]=useState(null), [corner,setCorner]=useState('Ventanal'), [name,setName]=useState(''), [time,setTime]=useState(''), [notice,setNotice]=useState(''), [sound,setSound]=useState(false)
   const audio=useRef(null), drink=drinks[active]
-  useEffect(()=>{ const start=performance.now(); let raf; const tick=()=>{ const value=Math.min(100,Math.floor((performance.now()-start)/19));setProgress(value);if(value<100)raf=requestAnimationFrame(tick) };raf=requestAnimationFrame(tick);return()=>cancelAnimationFrame(raf)},[])
+  useEffect(()=>{
+    const images=['/espresso.png','/latte.png','/cold-brew.png','/coffee-atmospheres.png','/cafe-interior.png']
+    let cancelled=false
+    let loaded=0
+    const total=images.length+1
+    const advance=()=>{
+      if(cancelled)return
+      loaded+=1
+      setProgress(Math.round(loaded/total*100))
+      if(loaded===total)setEntered(true)
+    }
+    images.forEach(src=>{
+      const image=new Image()
+      image.onload=advance
+      image.onerror=advance
+      image.src=src
+    })
+    Promise.resolve(document.fonts?.ready).then(advance,advance)
+    return()=>{cancelled=true}
+  },[])
   useEffect(()=>{ if(!entered)return; const lenis=new Lenis({duration:1.15,smoothWheel:true}); const update=t=>lenis.raf(t*1000);lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(update);gsap.ticker.lagSmoothing(0);const ctx=gsap.context(()=>{gsap.from('.hero-title > *',{y:90,opacity:0,stagger:.18,duration:1.35,ease:'power3.out'});gsap.utils.toArray('.chapter').forEach((chapter)=>{gsap.fromTo(chapter.querySelector('.chapter-art'),{scale:1.16},{scale:1,ease:'none',scrollTrigger:{trigger:chapter,start:'top bottom',end:'bottom top',scrub:1}});gsap.from(chapter.querySelector('.chapter-product'),{y:100,opacity:0,scale:.9,duration:1.1,ease:'power2.out',scrollTrigger:{trigger:chapter,start:'top 65%'}});gsap.from(chapter.querySelectorAll('.chapter-copy > *'),{y:55,opacity:0,stagger:.1,duration:1,ease:'power2.out',scrollTrigger:{trigger:chapter,start:'top 65%'}})});gsap.from('.story-copy > *',{scrollTrigger:{trigger:'.story',start:'top 75%'},y:35,opacity:0,stagger:.12,duration:.9});gsap.from('.closing-inner > *',{scrollTrigger:{trigger:'.closing',start:'top 75%'},y:30,opacity:0,stagger:.14,duration:.85})});return()=>{ctx.revert();gsap.ticker.remove(update);lenis.destroy()}},[entered])
   useEffect(()=>{ if(entered) gsap.fromTo('.drink-info > *',{y:14,opacity:0},{y:0,opacity:1,stagger:.07,duration:.55,ease:'power2.out'}) },[active,entered])
   useEffect(()=>()=>{audio.current?.close()},[])
   const toggleSound=()=>{ if(sound){audio.current?.suspend();setSound(false);return}const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;const ctx=audio.current||new Ctx();audio.current=ctx; if(!ctx._doree){const osc=ctx.createOscillator(), filter=ctx.createBiquadFilter(), gain=ctx.createGain();osc.type='sine';osc.frequency.value=174.6;filter.type='lowpass';filter.frequency.value=400;gain.gain.value=.014;osc.connect(filter).connect(gain).connect(ctx.destination);osc.start();ctx._doree=true}ctx.resume();setSound(true)}
   const submitReservation=e=>{e.preventDefault();if(!name.trim()){setNotice('Por favor, indica un nombre para la reserva.');return}if(!time){setNotice('Elige una hora para tu visita.');return}setNotice('Tu mesa te espera a la hora dorada. Vista previa: esta reserva no se ha enviado.')}
   return <div className={`app theme-${drink.scene}`}>
-    {!entered&&<div className="preloader"><div className="pre-top">L’Heure Dorée <span>Paris · Café de autor</span></div><div className="pre-center"><div className="pre-sun">✳</div><p>Un instante para saborear</p><strong>{progress<100?'Preparando la extracción...':'Listo para servir.'}</strong></div><div className="pre-bottom"><div className="pre-track"><span style={{width:`${progress}%`}}/></div><div className="pre-status"><span>{String(progress).padStart(2,'0')}%</span>{progress===100?<button onClick={()=>setEntered(true)}>Entrar al salón <span>↗</span></button>:<span>Cargando activos.</span>}</div></div></div>}
+    {!entered&&<div className="preloader"><div className="pre-top">L’Heure Dorée <span>Paris · Café de autor</span></div><div className="pre-center"><div className="pre-sun">✳</div><p>Un instante para saborear</p><strong>Preparando la extracción...</strong></div><div className="pre-bottom"><div className="pre-track"><span style={{width:`${progress}%`}}/></div><div className="pre-status"><span>{String(progress).padStart(2,'0')}%</span></div></div></div>}
     <header className="header"><a href="#inicio" className="wordmark">L’Heure <em>Dorée</em><span className="mark-star">✳</span></a><nav><a href="#coleccion">La carte</a><a href="#historia">Notre histoire</a><button onClick={()=>{setPanel('reserve');setNotice('')}}>Réserver <span>↗</span></button></nav></header>
     <main id="inicio">
       <section className="hero" id="coleccion"><div className="ambient"><div className="arch arch-one"/><div className="arch arch-two"/><div className="sun-disc"/><div className="floor-line"/><div className="grain-overlay"/></div>

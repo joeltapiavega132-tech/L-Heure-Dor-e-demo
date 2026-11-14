@@ -25,3 +25,22 @@
 @media(max-width:600px){.chapter{height:850px}.chapter:after,.chapter-doree:after,.chapter-ambre:after{background:linear-gradient(#12130faf 0%,#12130f28 55%,#12130f99 100%)}.chapter-art{background-size:300% 100%}.chapter-copy{left:26px;right:26px;top:55px;transform:none;max-width:none}.chapter-copy h2{font-size:66px;margin:16px 0}.chapter-copy small{font-size:12px;max-width:290px;margin-top:10px}.chapter-copy button{margin-top:18px}.chapter-product{top:auto;bottom:35px;right:0;width:100%;height:52%}.chapter-ambre .chapter-product{top:auto;bottom:20px;right:0;width:100%;height:55%}.story-art{min-height:600px;background-position:center}.story-copy{padding:65px 28px}.closing{min-height:660px;align-items:flex-start}.closing-inner{max-width:100%}.closing:after{top:auto;bottom:-45px;right:-3%;height:58%;width:95%;opacity:.72}}
 .drink-selector button{grid-template-columns:1fr 16px;gap:10px}.drink-selector button strong{grid-column:1}.selector-dot{grid-column:2}.side-rail{top:108px}.side-rail button{color:#4b463e}.manifesto{min-height:68vh}.manifesto h2{margin:0 0 36px}.chapter-copy h2{margin-top:0}.story-copy h2{margin-top:0}
 @media(max-width:600px){.drink-selector button{grid-template-columns:1fr}.selector-dot{display:none}.manifesto{min-height:50vh}.manifesto h2{font-size:53px}.chapter-copy h2{margin-top:0}}
+@media(max-width:600px){
+  .hero,.theme-doree .hero,.theme-ambre .hero{height:auto;min-height:0;display:flex;flex-direction:column;padding:118px 20px 32px}
+  .hero-title{position:relative;top:auto;left:auto;order:1;width:100%}
+  .hero-title span{font-size:12vw}
+  .hero-title strong{font-size:31vw;line-height:.82}
+  .cup-stage,.theme-ambre .cup-stage{position:relative;top:auto;left:auto;order:2;width:100%;height:320px;margin:8px 0 0}
+  .coffee-image,.theme-ambre .coffee-image{width:100%;height:100%}
+  .theme-ambre .coffee-image{width:82%;height:82%}
+  .drink-selector{position:relative;top:auto;bottom:auto;left:auto;right:auto;order:3;width:100%;margin:6px 0 30px}
+  .hero-bottom{position:relative;left:auto;right:auto;bottom:auto;order:4;width:100%;display:block}
+  .drink-info{width:100%}
+  .hero-controls{position:relative;right:auto;bottom:auto;display:flex;align-items:flex-end;margin-top:18px}
+  .hero-controls button{width:auto}
+  .ambient:before,.theme-doree .ambient:before,.theme-ambre .ambient:before{inset:145px -10% auto 0;height:440px}
+  .cup-stage{overflow:hidden}
+  .theme-ambre .cup-stage{height:280px;margin:8px 0 18px}
+  .theme-ambre .coffee-image{width:78%;height:78%;max-height:100%}
+  .drink-selector{z-index:10}
+}
