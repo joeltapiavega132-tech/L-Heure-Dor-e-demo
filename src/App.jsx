@@ -65,14 +65,21 @@ function App(){
   const audio=useRef(null), drink=drinks[active]
   useEffect(()=>{
     const images=['/espresso.png','/latte.png','/cold-brew.png','/coffee-atmospheres.png','/cafe-interior.png']
+    const startedAt=performance.now()
+    const minimumDuration=3200
     let cancelled=false
     let loaded=0
+    let frame
     const total=images.length+1
-    const advance=()=>{
+    const advance=()=>{if(!cancelled)loaded+=1}
+    const tick=now=>{
       if(cancelled)return
-      loaded+=1
-      setProgress(Math.round(loaded/total*100))
-      if(loaded===total)setEntered(true)
+      const paced=Math.min(100,Math.floor((now-startedAt)/minimumDuration*100))
+      const ready=loaded===total?100:Math.min(95,Math.floor(loaded/total*100)+15)
+      const next=Math.min(paced,ready)
+      setProgress(next)
+      if(next===100){setEntered(true);return}
+      frame=requestAnimationFrame(tick)
     }
     images.forEach(src=>{
       const image=new Image()
@@ -81,7 +88,8 @@ function App(){
       image.src=src
     })
     Promise.resolve(document.fonts?.ready).then(advance,advance)
-    return()=>{cancelled=true}
+    frame=requestAnimationFrame(tick)
+    return()=>{cancelled=true;cancelAnimationFrame(frame)}
   },[])
   useEffect(()=>{ if(!entered)return; const lenis=new Lenis({duration:1.15,smoothWheel:true}); const update=t=>lenis.raf(t*1000);lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(update);gsap.ticker.lagSmoothing(0);const ctx=gsap.context(()=>{gsap.from('.hero-title > *',{y:90,opacity:0,stagger:.18,duration:1.35,ease:'power3.out'});gsap.utils.toArray('.chapter').forEach((chapter)=>{gsap.fromTo(chapter.querySelector('.chapter-art'),{scale:1.16},{scale:1,ease:'none',scrollTrigger:{trigger:chapter,start:'top bottom',end:'bottom top',scrub:1}});gsap.from(chapter.querySelector('.chapter-product'),{y:100,opacity:0,scale:.9,duration:1.1,ease:'power2.out',scrollTrigger:{trigger:chapter,start:'top 65%'}});gsap.from(chapter.querySelectorAll('.chapter-copy > *'),{y:55,opacity:0,stagger:.1,duration:1,ease:'power2.out',scrollTrigger:{trigger:chapter,start:'top 65%'}})});gsap.from('.story-copy > *',{scrollTrigger:{trigger:'.story',start:'top 75%'},y:35,opacity:0,stagger:.12,duration:.9});gsap.from('.closing-inner > *',{scrollTrigger:{trigger:'.closing',start:'top 75%'},y:30,opacity:0,stagger:.14,duration:.85})});return()=>{ctx.revert();gsap.ticker.remove(update);lenis.destroy()}},[entered])
   useEffect(()=>{ if(entered) gsap.fromTo('.drink-info > *',{y:14,opacity:0},{y:0,opacity:1,stagger:.07,duration:.55,ease:'power2.out'}) },[active,entered])
